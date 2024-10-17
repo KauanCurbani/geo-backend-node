@@ -7,6 +7,8 @@ import placesController from "./application/controllers/places_controller";
 import { polygonsController } from "./application/controllers/polygons_controller";
 import dockingController from "./application/controllers/docking_controller";
 import { authMiddleware } from "./application/middleware/auth-middleware";
+import { populateQuery } from "./data";
+import { env } from "./utils/env";
 
 const app = express();
 app.use(express.json());
@@ -21,6 +23,11 @@ async function onInitializeDatabase() {
   console.log = (entry) => process.stdout.write("[INFO] " + entry + "\n");
   console.error = (entry) => process.stderr.write("[ERROR] " + entry + "\n");
 
+  if (env.POPULATE_DATABASE) {
+    console.log("Populating database");
+    await populateDb();
+  }
+
   console.log("Database initialized");
   app.listen(3000, () => {
     console.log("Server running on port 3000");
@@ -30,3 +37,7 @@ async function onInitializeDatabase() {
 AppDataSource.initialize()
   .then(onInitializeDatabase)
   .catch((error) => console.log(error));
+
+async function populateDb() {
+  AppDataSource.query(populateQuery);
+}
