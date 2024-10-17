@@ -1,0 +1,39 @@
+version: '3.9'
+services:
+  postgis:
+    image: postgis/postgis:latest
+    restart: always
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: docker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+  # Run it on first time only
+  # osrm_preprocess:
+  #   user: "${USER_ID}:${GROUP_ID}"
+  #   image: osrm/osrm-backend
+  #   command: >
+  #     bash -c "osrm-extract -p /opt/car.lua /data/map.osm.pbf &&
+  #              osrm-partition /data/map.osrm &&
+  #              osrm-contract /data/map.osrm"
+  #   volumes:
+  #     - ./data:/data
+  #   depends_on:
+  #     - postgis
+
+  osrm:
+    # user: "${USER_ID}:${GROUP_ID}"
+    image: osrm/osrm-backend
+    command: ["osrm-routed", "/data/map.osrm"]
+    volumes:
+      - ./data:/data
+    ports:
+      - "5000:5000"
+    # depends_on:
+    #   - osrm_preprocess
+
+volumes:
+  postgis_data:
