@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { AppDataSource } from "./infra/database/data-source";
 import express from "express";
 import cors from "cors";
